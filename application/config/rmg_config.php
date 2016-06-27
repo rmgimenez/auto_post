@@ -37,6 +37,14 @@ $config['origens_deviantart'] = array(
 $config['parametros'] = array(
     'smtp_envio' => 0, // colocar aqui o indice do dados_smtp que quero utilizar, se tiver -1 é para pegar um aleatório toda vez que for postar
     'qtd_pegar_deviantart' => 3, // quantidade de rss do deviantart que será lido por vez no job
+    
+    /*
+     * Esse índice do array armazena a chance rodar a função de pegar posts
+     * no job principal. Por exemplo, se tiver 50 indica que tem 50% de chance
+     * de rodar para pegar os posts e 50% de chance para postar.
+     * Se tiver -1 indica que é para rodar as duas funções no job
+     */
+    'chance_de_pegar_posts' => 50,
 );
 
 /*
