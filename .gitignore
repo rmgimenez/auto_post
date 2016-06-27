@@ -5,6 +5,7 @@ application/cache/*
 !application/cache/.htaccess
 
 application/logs/*
+application/banco/banco.sqlite
 !application/logs/index.html
 !application/logs/.htaccess
 
