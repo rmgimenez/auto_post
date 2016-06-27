@@ -49,7 +49,7 @@ class C_Job extends CI_Controller {
         if($itens)
         {
             foreach ($itens as $item) {
-                $post_existe = $this->M_Posts->find_by_id_imgur($item->id_imgur);
+                $post_existe = $this->M_Posts->find_by_id_imgur($item->id);
                 
                 if($post_existe != NULL)
                 {
