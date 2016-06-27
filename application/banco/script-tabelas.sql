@@ -1,15 +1,11 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- * Author:  rgimenez
- * Created: 27/06/2016
- */
+/*
+drop table posts;
+drop table imagens;
+drop table postagens;
+*/
 -- http://imgur.com/r/cosplay/top/day.xml
 create table posts(
-    id integer primary key auto_increment,
+    id integer primary key autoincrement,
     id_imgur varchar(50),
     hash varchar(20),
     author varchar(100),
@@ -26,17 +22,18 @@ create table posts(
     is_album integer,
     site_origem varchar(100), -- imgur ou deviantart
     tags varchar(200),
-    link vachar(200)
+    link vachar(200),
+    ext varchar(10)
 );
 
 create table imagens(
-    id integer primary key auto_increment,
+    id integer primary key autoincrement,
     posts_id integer,
     link varchar(200)
 );
 
 create table postagens(
-    id integer primary key auto_increment,
+    id integer primary key autoincrement,
     post_id integer,
     data_post timestamp,
     destino_postado integer

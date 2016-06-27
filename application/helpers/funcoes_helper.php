@@ -50,6 +50,24 @@ if(!function_exists('gera_link_reddit'))
     }
 }
 
+/*
+ * Retorna 1 ou 0 dependendo do que vier do xml
+ */
+function boleano_xml($valor)
+{
+	if($valor == 'true')
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+/*
+ * Limpa o título dos posts
+ */
 if(!function_exists('limpa_titulo'))
 {
     function limpa_titulo($titulo)
@@ -68,9 +86,21 @@ if(!function_exists('limpa_titulo'))
         $post_titulo = str_replace('[FOUND]', '', $post_titulo);
         $post_titulo = str_replace('[SELF]', '', $post_titulo);
         $post_titulo = str_replace('[HELP]', '', $post_titulo);    
-        return $post_titulo;
+        return trim($post_titulo);
     }
 }
 
-
-
+if(!function_exists('link_item_imgur'))
+{
+    function link_item_imgur($hash, $extensao = null)
+    {
+        if($extensao === null)        
+        {
+            return 'http://imgur.com/a/'.$hash;
+        }
+        else
+        {
+            return 'http://imgur.com/'.$hash.$extensao;
+        }
+    }
+}

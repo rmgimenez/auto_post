@@ -38,6 +38,10 @@ class C_Job extends CI_Controller {
         }
     }
     
+    /*
+     * Pega os itens de um subreddit e um período e insere ou atualiza no banco
+     * de dados
+     */
     private function pegar_imgur($subreddit, $periodo)
     {
         $itens = get_imgur_reddit($subreddit, $periodo);
@@ -47,9 +51,15 @@ class C_Job extends CI_Controller {
             foreach ($itens as $item) {
                 $post_existe = $this->M_Posts->find_by_id_imgur($item->id_imgur);
                 
-                if($post_existe)
+                if($post_existe != NULL)
                 {
                     // atualiza
+                    $post = array(
+                        'views' => $item->views,
+                        'score' => $item->score
+                    );
+                    $this->db->where('id', $post_existe['id']);
+                    $this->db->update('posts', $post);
                 }
                 else
                 {
@@ -62,8 +72,53 @@ class C_Job extends CI_Controller {
                     $post['author'] = $item->author;
                     $post['score'] = $item->score;
                     $post['description'] = $item->description;                    
+                    $post['nsfw'] = boleano_xml($item->nsfw);
+                    $post['reddit'] = $item->reddit;
+                    $post['ext'] = $item->ext;
+                    $post['subreddit'] = $item->subreddit;
+                    $post['is_album'] = boleano_xml($item->is_album);              
+                    if(boleano_xml($item->is_album) == 1)
+                    {
+                        $post['link'] = link_item_imgur($item->hash);
+                    }
+                    else
+                    {
+                        $post['link'] = link_item_imgur($item->hash, $item->ext);                        
+                    }
 
-                    $this->M_Posts->insert($post);
+                    $id = $this->M_Posts->insert($post);
+                    if(boleano_xml($item->is_album) == 1)
+                    {
+                        // se for um album
+                        $stream = stream_context_create(array
+                        (
+                                'http' => array('user_agent' => 'Nokia6600/1.0 (5.27.0) SymbianOS/7.0s Series60/2.0 Profile/MIDP-2.0 Configuration/CLDC-1')
+                        ));
+                        $src = file_get_contents('http://imgur.com/a/'.$item->hash.'/layout/blog', FALSE, $stream);
+                        $doc = new DOMDocument();
+                        @$doc->loadHTML($src);
+                        $tags = $doc->getElementsByTagName('img');
+                        foreach ($tags as $tag) 
+                        {
+                            //echo $tag->getAttribute('src').'</br>';
+                            if(substr($tag->getAttribute('src'), 0, 13) == '//i.imgur.com')
+                            {
+                                $link_imagem = 'http:'.$tag->getAttribute('src');
+                                $imagem = array();
+                                $imagem['posts_id'] = $id;
+                                $imagem['link'] = $link_imagem;
+                                $this->M_Imagens->insert($imagem);
+                            }   
+                        }                        
+                    }
+                    else
+                    {
+                        // se não for um album                        
+                        $imagem = array();
+                        $imagem['posts_id'] = $id;
+                        $imagem['link'] = link_item_imgur($item->hash, $item->ext);
+                        $this->M_Imagens->insert($imagem);
+                    }
                 }
             }                       
         }    
