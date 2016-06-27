@@ -34,9 +34,27 @@ $config['origens_deviantart'] = array(
     ),
 );
 
+$config['destinos'] = array(
+    0 => array(
+        'email' => '',
+        'tipo_site' => 'tumblr',
+        'site' => 'cosplay-and-costumes.tumblr.com',
+        'pode_nsfw' => FALSE,
+        'tags' => '#cosplay',
+    ),
+);
+
+$config['encurtador_link'] = array(
+    0 => 'http://q.gs/1905608/',    
+);
+
 $config['parametros'] = array(
     'smtp_envio' => 0, // colocar aqui o indice do dados_smtp que quero utilizar, se tiver -1 é para pegar um aleatório toda vez que for postar
-    'qtd_pegar_deviantart' => 3, // quantidade de rss do deviantart que será lido por vez no job
+    'qtd_pegar_deviantart' => 1, // quantidade de rss do deviantart que será lido por vez no job
+    
+    'usar_encurtador_link' => TRUE,
+    // colocar aqui qual o índice do item encurtador_link que irá utilizar
+    'tipo_encurtador_link' => 0,
     
     /*
      * Esse índice do array armazena a chance rodar a função de pegar posts
@@ -45,6 +63,27 @@ $config['parametros'] = array(
      * Se tiver -1 indica que é para rodar as duas funções no job
      */
     'chance_de_pegar_posts' => 50,
+    
+    /*
+     * Quantidade de itens que serão postados por vez que rodar o job
+     */
+    'qtd_postar_imgur' => 1,
+    'qtd_postar_deviantart' => 1,
+    
+    /*
+     * Forma de buscar o item do imgur para envio
+     * 0 = aleatório
+     * 1 = ordenado por ID de forma decrescente (último inserido)
+     * 2 = ordenado por score de forma decrescente (com maior score)
+     */
+    'forma_envio_imgur' => 1,
+    
+    /*
+     * Forma de buscar o item do deviantart para envio
+     * 0 = aleatório
+     * 1 = ordenado por ID de forma decrescente (último inserido)
+     */
+    'forma_envio_imgur' => 0,
 );
 
 /*

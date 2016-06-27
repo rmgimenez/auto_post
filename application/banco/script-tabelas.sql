@@ -14,6 +14,7 @@ create table posts(
     hash varchar(20),
     author varchar(100),
     title varchar(100),
+    title_limpo varchar(100),
     score integer,
     views integer,
     reddit varchar(200),
@@ -24,11 +25,19 @@ create table posts(
     nsfw integer,
     is_album integer,
     site_origem varchar(100), -- imgur ou deviantart
-    tags varchar(200)
+    tags varchar(200),
+    link vachar(200)
 );
 
 create table imagens(
-id integer primary key auto_increment,
-posts_id integer,
-link varchar(200)
+    id integer primary key auto_increment,
+    posts_id integer,
+    link varchar(200)
+);
+
+create table postagens(
+    id integer primary key auto_increment,
+    post_id integer,
+    data_post timestamp,
+    destino_postado integer
 );
