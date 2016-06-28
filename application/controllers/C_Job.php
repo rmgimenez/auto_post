@@ -42,19 +42,27 @@ class C_Job extends CI_Controller {
      * Pega os itens de um subreddit e um período e insere ou atualiza no banco
      * de dados
      */
-    private function pegar_imgur($subreddit, $periodo)
+    private function pegar_imgur($subreddit, $periodo, $origem)
     {
+        $total['origem'] = $origem['nome'];
+        $total['total'] = 0;
+        $total['atualizados'] = 0;
+        $total['inseridos'] = 0;
         $itens = get_imgur_reddit($subreddit, $periodo);
         // se não entrar no if significa que deu algum erro
         if($itens)
         {
             foreach ($itens as $item) 
             {
+                $total['total'] += 1;
+                
                 $post_existe = $this->M_Posts->find_by_id_imgur($item->id);
                 
                 if($post_existe != NULL)
                 {
                     // atualiza
+                    $total['atualizados'] += 1;
+                    
                     $post = array(
                         'views' => $item->views,
                         'score' => $item->score
@@ -65,6 +73,8 @@ class C_Job extends CI_Controller {
                 else
                 {
                     // insere
+                    $total['inseridos'] += 1;
+                    
                     $post = array();
                     $post['id_imgur'] = $item->id;
                     $post['hash'] = $item->hash;
@@ -78,7 +88,9 @@ class C_Job extends CI_Controller {
                     $post['ext'] = $item->ext;
                     $post['subreddit'] = $item->subreddit;
                     $post['site_origem'] = 'imgur';
-                    $post['is_album'] = boleano_xml($item->is_album);              
+                    $post['is_album'] = boleano_xml($item->is_album);     
+                    $post['grupo'] = $origem['grupo'];
+                    $post['tags'] = $origem['tags'];         
                     if(boleano_xml($item->is_album) == 1)
                     {
                         $post['link'] = link_item_imgur($item->hash);
@@ -123,19 +135,28 @@ class C_Job extends CI_Controller {
                     }
                 }
             }                       
-        }    
+        }   
+        
+        return $total; 
     }
     
-    public function pegar_deviantart()
+    public function pegar_deviantart($origem)
     {
-        $rss = 'http://backend.deviantart.com/rss.xml?q=favby%3AZ-Lord%2F61912148&type=deviation';
+        $total['origem'] = $origem['nome'];
+        $total['total'] = 0;
+        $total['atualizados'] = 0;
+        $total['inseridos'] = 0;
+        
+        $rss = $origem['rss'];
         $feed = get_url_data($rss);
         $feed_formatado = new SimpleXmlElement($feed);
         
-        //print_r($feed_formatado);
-        
         foreach($feed_formatado->channel->item as $entrada)
         {
+            $total['inseridos'] += 1;
+            
+            $total['total'] += 1;
+            
             $post_existe = $this->M_Posts->find_by_link($entrada->link);
             
             if($post_existe == NULL)
@@ -144,10 +165,19 @@ class C_Job extends CI_Controller {
                 $post['title'] = $entrada->title;
                 $post['title_limpo'] = limpa_titulo($entrada->title);
                 $post['description'] = $entrada->description;                    
-                $post['nsfw'] = 0;
-                $post['site_origem'] = 'devantart';
+                if($origem['possui_nsfw'])
+                {
+                    $post['nsfw'] = 1;
+                }
+                else
+                {
+                    $post['nsfw'] = 0;
+                }
+                $post['site_origem'] = 'deviantart';
                 $post['is_album'] = 0;
                 $post['link'] = $entrada->link;
+                $post['grupo'] = $origem['grupo'];
+                $post['tags'] = $origem['tags'];
                 $id = $this->M_Posts->insert($post);
                 $link_imagem = get_image_sites($entrada->link);
                 $imagem = array();
@@ -157,6 +187,10 @@ class C_Job extends CI_Controller {
                 
                                 
             }
+            else
+            {
+                $total['atualizados'] += 1;
+            }
         	/*echo $entrada->title.'</br>';
         	echo $entrada->link;
             echo get_image_sites($entrada->link);
@@ -164,17 +198,26 @@ class C_Job extends CI_Controller {
         	echo '</br></br>';*/
         }     
         
-        print('fim');   
+        return $total;   
     }
     
     public function job_pegar_posts()
     {
         $origens_imgur = $this->config->item('origens_imgur');
-        foreach ($origens_imgur as $origem) 
+        foreach($origens_imgur as $origem) 
         {
             if($origem['ativo'])
             {
-                $this->pegar_imgur($origem['nome_reddit'], 'day');
+                print_r($this->pegar_imgur($origem['nome_reddit'], 'day', $origem));
+            }
+        }
+        
+        $origens_deviantart = $this->config->item('origens_deviantart');
+        foreach($origens_deviantart as $origem)
+        {
+            if($origem['ativo'])
+            {
+                print_r($this->pegar_deviantart($origem));
             }
         }
     }

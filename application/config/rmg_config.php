@@ -8,29 +8,39 @@
 
 $config['origens_imgur'] = array(
     0 => array(
+        'nome' => 'r/cosplay',
         'nome_reddit' => 'cosplay',
         'tags' => '#cosplay #costumes',
-        'ativo' => TRUE
+        'ativo' => TRUE,
+        'grupo' => 'cosplay',
     ),
     
     1 => array(
+        'nome' => 'r/funny',
         'nome_reddit' => 'funny',
         'tags' => '#funny',
-        'ativo' => TRUE
+        'ativo' => TRUE,
+        'grupo' => 'cosplay',
     )
 );
 
 $config['origens_deviantart'] = array(
     0 => array(
+        'nome' => 'Lord%2F61912148&type=deviation',
         'rss' => 'http://backend.deviantart.com/rss.xml?q=favby%3AZ-Lord%2F61912148&type=deviation',
         'tags' => '#cosplay #sexy #girls #sexycosplay',
         'possui_nsfw' => FALSE, // indica se possui posts NFSW
+        'grupo' => 'cosplay',
+        'ativo' => TRUE,
     ),
     
     1 => array(
+        'nome' => 'Girls-Cosplay%2F33609516&type=deviation',
         'rss' => 'http://backend.deviantart.com/rss.xml?q=gallery%3AGirls-Cosplay%2F33609516&type=deviation',
         'tags' => '#cosplay #girls #sexy #deviantart',
         'possui_nsfw' => TRUE, // indica se possui posts NFSW
+        'grupo' => 'cosplay',
+        'ativo' => TRUE,
     ),
 );
 

@@ -23,7 +23,8 @@ create table posts(
     site_origem varchar(100), -- imgur ou deviantart
     tags varchar(200),
     link vachar(200),
-    ext varchar(10)
+    ext varchar(10),
+    grupo varchar(100)
 );
 
 create table imagens(
