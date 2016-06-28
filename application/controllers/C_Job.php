@@ -161,14 +161,14 @@ class C_Job extends CI_Controller {
         
         foreach($feed_formatado->channel->item as $entrada)
         {
-            $total['inseridos'] += 1;
-            
             $total['total'] += 1;
             
             $post_existe = $this->M_Posts->find_by_link($entrada->link);
             
             if($post_existe == NULL)
             {
+                $total['inseridos'] += 1;
+                
                 $post = array();
                 $post['title'] = $entrada->title;
                 $post['title_limpo'] = limpa_titulo($entrada->title);
@@ -192,8 +192,6 @@ class C_Job extends CI_Controller {
                 $imagem['posts_id'] = $id;
                 $imagem['link'] = $link_imagem;
                 $this->M_Imagens->insert($imagem);
-                
-                                
             }
             else
             {
