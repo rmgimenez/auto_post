@@ -48,7 +48,8 @@ class C_Job extends CI_Controller {
         // se não entrar no if significa que deu algum erro
         if($itens)
         {
-            foreach ($itens as $item) {
+            foreach ($itens as $item) 
+            {
                 $post_existe = $this->M_Posts->find_by_id_imgur($item->id);
                 
                 if($post_existe != NULL)
@@ -76,6 +77,7 @@ class C_Job extends CI_Controller {
                     $post['reddit'] = $item->reddit;
                     $post['ext'] = $item->ext;
                     $post['subreddit'] = $item->subreddit;
+                    $post['site_origem'] = 'imgur';
                     $post['is_album'] = boleano_xml($item->is_album);              
                     if(boleano_xml($item->is_album) == 1)
                     {
@@ -122,6 +124,47 @@ class C_Job extends CI_Controller {
                 }
             }                       
         }    
+    }
+    
+    public function pegar_deviantart()
+    {
+        $rss = 'http://backend.deviantart.com/rss.xml?q=favby%3AZ-Lord%2F61912148&type=deviation';
+        $feed = get_url_data($rss);
+        $feed_formatado = new SimpleXmlElement($feed);
+        
+        //print_r($feed_formatado);
+        
+        foreach($feed_formatado->channel->item as $entrada)
+        {
+            $post_existe = $this->M_Posts->find_by_link($entrada->link);
+            
+            if($post_existe == NULL)
+            {
+                $post = array();
+                $post['title'] = $entrada->title;
+                $post['title_limpo'] = limpa_titulo($entrada->title);
+                $post['description'] = $entrada->description;                    
+                $post['nsfw'] = 0;
+                $post['site_origem'] = 'devantart';
+                $post['is_album'] = 0;
+                $post['link'] = $entrada->link;
+                $id = $this->M_Posts->insert($post);
+                $link_imagem = get_image_sites($entrada->link);
+                $imagem = array();
+                $imagem['posts_id'] = $id;
+                $imagem['link'] = $link_imagem;
+                $this->M_Imagens->insert($imagem);
+                
+                                
+            }
+        	/*echo $entrada->title.'</br>';
+        	echo $entrada->link;
+            echo get_image_sites($entrada->link);
+        	echo $entrada->description;
+        	echo '</br></br>';*/
+        }     
+        
+        print('fim');   
     }
     
     public function job_pegar_posts()

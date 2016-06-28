@@ -104,3 +104,67 @@ if(!function_exists('link_item_imgur'))
         }
     }
 }
+
+
+/**
+ * Funções utilizadas para pegar os posts da deviantart
+ */
+ 
+function get_image_sites($link)
+{
+	$link = fix_url($link);
+	$image_sites = array("flickr" => '/https?:\/\/[w\.]*flickr\.com\/photos\/([^?]*)/is', "twitpic" => '/https?:\/\/[w\.]*twitpic\.com\/([^?]*)/is', "imgur" => '/https?:\/\/[w\.]*imgur\.[^\/]*\/([^?]*)/is',	"deviantart" => '/https?:\/\/[^\/]*\.*deviantart\.[^\/]*\/([^?]*)/is', "instagram" => '/https?:\/\/[w\.]*instagram\.[^\/]*\/([^?]*)/is');
+	foreach($image_sites as $site => $regexp)
+	{
+		preg_match($regexp, $link, $match);
+		if(!empty($match))
+		{
+			switch ($site)
+			{
+				case "flickr":
+				$flickr_json = "http://www.flickr.com/services/oembed/?format=json&maxwidth=500&maxheight=380&url=".$link;
+				$image = get_json_response($flickr_json);
+				break;
+				case "instagram":
+				$instagram_json = "http://api.instagram.com/oembed?format=json&maxwidth=500&maxheight=380&url=".$link;
+				$image = get_json_response($instagram_json);
+				break;
+				case "deviantart":
+				$deviantart_json = "http://backend.deviantart.com/oembed?format=json&thumbnail_width=500&thumbnail_height=380&url=".$link;
+				$image = get_json_response($deviantart_json);
+				break;
+				case "twitpic":
+				$code = $match[1];
+				$image = "<img src='http://twitpic.com/show/large/".$code.".jpg'>";
+				break;
+				case "imgur":
+				$imgur_json = "http://api.imgur.com/oembed/?format=json&url=".$link;
+				$image = get_json_response($imgur_json);
+				break;
+				case "":
+				$image = "";
+				break;
+			}
+			return $image;
+		}
+	}
+}
+
+//function used to fix the url by adding http / https
+function fix_url($url) {
+ if (substr($url, 0, 7) == 'http://') { return $url; }
+ if (substr($url, 0, 8) == 'https://') { return $url; }
+ return 'http://'. $url;
+}
+
+function get_json_response($url)
+{
+	$json_response = get_url_data($url);
+	$res = json_decode($json_response, true);
+	if(is_array($res) && !empty($res))
+	{
+		//$image = "<img src='".$res["url"]."'>";
+        $image = $res["url"];
+		return $image;
+	}
+}
