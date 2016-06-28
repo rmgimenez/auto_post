@@ -1,11 +1,8 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Origens dos subreddit do site imgur.com
  */
-
 $config['origens_imgur'] = array(
     0 => array(
         'nome' => 'r/cosplay',
@@ -24,6 +21,9 @@ $config['origens_imgur'] = array(
     )
 );
 
+/**
+ * Links rss das páginas do deviantart
+ */
 $config['origens_deviantart'] = array(
     0 => array(
         'nome' => 'Lord%2F61912148&type=deviation',
@@ -31,7 +31,7 @@ $config['origens_deviantart'] = array(
         'tags' => '#cosplay #sexy #girls #sexycosplay',
         'possui_nsfw' => FALSE, // indica se possui posts NFSW
         'grupo' => 'cosplay',
-        'ativo' => TRUE,
+        'ativo' => FALSE,
     ),
     
     1 => array(
@@ -44,6 +44,9 @@ $config['origens_deviantart'] = array(
     ),
 );
 
+/**
+ * Destinos que receberão os posts
+ */
 $config['destinos'] = array(
     0 => array(
         'email' => '',
@@ -58,13 +61,14 @@ $config['encurtador_link'] = array(
     0 => 'http://q.gs/1905608/',    
 );
 
+/**
+ * Parâmetros gerais do sistema
+ */
 $config['parametros'] = array(
-    'smtp_envio' => 0, // colocar aqui o indice do dados_smtp que quero utilizar, se tiver -1 é para pegar um aleatório toda vez que for postar
     'qtd_pegar_deviantart' => 1, // quantidade de rss do deviantart que será lido por vez no job
     
-    'usar_encurtador_link' => TRUE,
-    // colocar aqui qual o índice do item encurtador_link que irá utilizar
-    'tipo_encurtador_link' => 0,
+    'usar_encurtador_link' => TRUE, // TRUE ou FALSE, indica se que usar o encurtador de link no campo source dos posts
+    'tipo_encurtador_link' => 0, // coloque aqui o índice do item 'encurtador_link'
     
     /*
      * Esse índice do array armazena a chance rodar a função de pegar posts
@@ -73,30 +77,9 @@ $config['parametros'] = array(
      * Se tiver -1 indica que é para rodar as duas funções no job
      */
     'chance_de_pegar_posts' => 50,
-    
-    /*
-     * Quantidade de itens que serão postados por vez que rodar o job
-     */
-    'qtd_postar_imgur' => 1,
-    'qtd_postar_deviantart' => 1,
-    
-    /*
-     * Forma de buscar o item do imgur para envio
-     * 0 = aleatório
-     * 1 = ordenado por ID de forma decrescente (último inserido)
-     * 2 = ordenado por score de forma decrescente (com maior score)
-     */
-    'forma_envio_imgur' => 1,
-    
-    /*
-     * Forma de buscar o item do deviantart para envio
-     * 0 = aleatório
-     * 1 = ordenado por ID de forma decrescente (último inserido)
-     */
-    'forma_envio_imgur' => 0,
 );
 
-/*
+/**
  * Essa configuração armazena as configurações dos email responsáveis
  * pelos envios dos emails
  */
@@ -112,6 +95,18 @@ $config['dados_smtp'] = array(
         'is_smtp' => TRUE,
         'smtp_auth' => TRUE,
         'ativo' => TRUE,
-    )
+    ),
 );
 
+$config['jobs_para_enviar'] = array(
+    0 => array(
+        'ativo' => TRUE,
+        'origem_grupo' => 'cosplay',
+        'origem_site' => 'todos', // colocar aqui o site que é para pegar, pode ser: imgur, deviantart ou todos
+        'ordem' => 'id', // colocar aqui por qual campo ordenar ou se é aleatório
+        'ordem_forma' => 'desc',
+        'quantidade' => 1, // quantos serão postados por vez
+        'servidor_smtp' => 0, // índice do 'dados_smtp'
+        'destino' => 0, // índice do 'destinos'
+    ),
+);

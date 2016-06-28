@@ -108,8 +108,7 @@ if(!function_exists('link_item_imgur'))
 
 /**
  * Funções utilizadas para pegar os posts da deviantart
- */
- 
+ */ 
 function get_image_sites($link)
 {
 	$link = fix_url($link);
@@ -167,4 +166,14 @@ function get_json_response($url)
         $image = $res["url"];
 		return $image;
 	}
+}
+
+/**
+ * Função que retorna o link do reddit formatado
+ * como entrada seria:
+ *      /r/cosplay/comments/4qa8we/photographer_pokemon_umbreon_cosplay/
+ */
+function formata_link_reddit($parte_reddit)
+{
+    return 'http://reddit.com'.$parte_reddit;
 }

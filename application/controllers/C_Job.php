@@ -97,7 +97,7 @@ class C_Job extends CI_Controller {
                     }
                     else
                     {
-                        $post['link'] = link_item_imgur($item->hash, $item->ext);                        
+                        $post['link'] = 'http://imgur.com/'.$item->hash;                        
                     }
 
                     $id = $this->M_Posts->insert($post);
@@ -140,7 +140,7 @@ class C_Job extends CI_Controller {
         return $total; 
     }
     
-    public function pegar_deviantart($origem)
+    private function pegar_deviantart($origem)
     {
         $total['origem'] = $origem['nome'];
         $total['total'] = 0;
@@ -149,7 +149,15 @@ class C_Job extends CI_Controller {
         
         $rss = $origem['rss'];
         $feed = get_url_data($rss);
-        $feed_formatado = new SimpleXmlElement($feed);
+
+        try
+        {
+            $feed_formatado = new SimpleXmlElement($feed);
+        } 
+        catch (Exception $e) 
+        {
+            $total['erros'][] = 'Erro ao ler feed: '.$e->getMessage();                        
+        }
         
         foreach($feed_formatado->channel->item as $entrada)
         {
@@ -212,12 +220,27 @@ class C_Job extends CI_Controller {
             }
         }
         
+        $parametros = $this->config->item('parametros');
         $origens_deviantart = $this->config->item('origens_deviantart');
-        foreach($origens_deviantart as $origem)
+        
+        foreach($origens_deviantart as $key=>$value)
         {
-            if($origem['ativo'])
+            if($value['ativo'] == FALSE)
             {
-                print_r($this->pegar_deviantart($origem));
+                unset($origens_deviantart[$key]);
+            }                        
+        }
+                        
+        $origens_sorteadas = array_rand($origens_deviantart, $parametros['qtd_pegar_deviantart']);
+        if($parametros['qtd_pegar_deviantart'] == 1)
+        {
+            print_r($this->pegar_deviantart($origens_deviantart[$origens_sorteadas]));
+        }
+        else if($parametros['qtd_pegar_deviantart'] >= 1)
+        {
+            foreach($origens_sorteadas as $origem_sorteada)
+            {
+                print_r($this->pegar_deviantart($origens_deviantart[$origens_sorteadas]));
             }
         }
     }
@@ -225,5 +248,24 @@ class C_Job extends CI_Controller {
     public function job_enviar_posts()
     {
         echo 'Job enviar_posts';        
+    }
+    
+    public function testes()
+    {
+        $parametros = $this->config->item('parametros');        
+        $origens_deviantart = $this->config->item('origens_deviantart');
+        print_r($origens_deviantart);
+        
+        foreach($origens_deviantart as $key=>$value)
+        {
+            if($value['ativo'] == FALSE)
+            {
+                unset($origens_deviantart[$key]);
+            }                        
+        }
+        print_r($origens_deviantart);
+        
+        $origens = array_rand($origens_deviantart, $parametros['qtd_pegar_deviantart']);
+        print_r($origens);
     }
 }
