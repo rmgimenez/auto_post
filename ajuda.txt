@@ -1,3 +1,7 @@
 Links de ajuda sobre PHP no geral
 
 http://br.phptherightway.com/#site-header
+
+Enviar email com o codeigniter
+http://stackoverflow.com/questions/33165341/sending-long-description-along-with-attachment-using-smtp-in-codeigniter
+https://www.codeigniter.com/userguide3/libraries/email.html
