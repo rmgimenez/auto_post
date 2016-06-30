@@ -250,20 +250,8 @@ class C_Job extends CI_Controller {
     
     public function testes()
     {
-        $parametros = $this->config->item('parametros');        
-        $origens_deviantart = $this->config->item('origens_deviantart');
-        print_r($origens_deviantart);
-        
-        foreach($origens_deviantart as $key=>$value)
-        {
-            if($value['ativo'] == FALSE)
-            {
-                unset($origens_deviantart[$key]);
-            }                        
-        }
-        print_r($origens_deviantart);
-        
-        $origens = array_rand($origens_deviantart, $parametros['qtd_pegar_deviantart']);
-        print_r($origens);
+        $this->load->helper('imgur');
+        $imgur = new Imgur();
+        print_r($imgur->get_array_imgur('cosplay', 'day'));
     }
 }
