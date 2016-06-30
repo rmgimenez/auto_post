@@ -38,12 +38,14 @@ class C_Job extends CI_Controller {
         }
     }
     
-    /*
+    /**
      * Pega os itens de um subreddit e um período e insere ou atualiza no banco
      * de dados
      */
-    private function pegar_imgur($subreddit, $periodo, $origem)
+    private function pegar_imgur($subreddit, $periodo, $origem_id)
     {
+        $origem = $this->M_Origens->find_id($origem_id);
+        
         $total['origem'] = $origem['nome'];
         $total['total'] = 0;
         $total['atualizados'] = 0;
@@ -99,7 +101,8 @@ class C_Job extends CI_Controller {
                     $post['total_gif'] = $item['total_gif'];
                     $post['total_imagens'] = $item['total_imagens'];     
                     $post['grupo'] = $origem['grupo'];
-                    $post['tags'] = $origem['tags'];         
+                    $post['tags'] = $origem['tags'];
+                    $post['origem_imgur_id'] = $origem['id'];
 
                     $id = $this->M_Posts->insert($post);
                     
@@ -117,105 +120,15 @@ class C_Job extends CI_Controller {
         return $total; 
     }
     
-    private function pegar_deviantart($origem)
-    {
-        $total['origem'] = $origem['nome'];
-        $total['total'] = 0;
-        $total['atualizados'] = 0;
-        $total['inseridos'] = 0;
-        
-        $rss = $origem['rss'];
-        $feed = get_url_data($rss);
-
-        try
-        {
-            $feed_formatado = new SimpleXmlElement($feed);
-        } 
-        catch (Exception $e) 
-        {
-            $total['erros'][] = 'Erro ao ler feed: '.$e->getMessage();                        
-        }
-        
-        foreach($feed_formatado->channel->item as $entrada)
-        {
-            $total['total'] += 1;
-            
-            $post_existe = $this->M_Posts->find_by_link($entrada->link);
-            
-            if($post_existe == NULL)
-            {
-                $total['inseridos'] += 1;
-                
-                $post = array();
-                $post['title'] = $entrada->title;
-                $post['title_limpo'] = limpa_titulo($entrada->title);
-                $post['description'] = $entrada->description;                    
-                if($origem['possui_nsfw'])
-                {
-                    $post['nsfw'] = 1;
-                }
-                else
-                {
-                    $post['nsfw'] = 0;
-                }
-                $post['site_origem'] = 'deviantart';
-                $post['is_album'] = 0;
-                $post['link'] = $entrada->link;
-                $post['grupo'] = $origem['grupo'];
-                $post['tags'] = $origem['tags'];
-                $id = $this->M_Posts->insert($post);
-                $link_imagem = get_image_sites($entrada->link);
-                $imagem = array();
-                $imagem['posts_id'] = $id;
-                $imagem['link'] = $link_imagem;
-                $this->M_Imagens->insert($imagem);
-            }
-            else
-            {
-                $total['atualizados'] += 1;
-            }
-        	/*echo $entrada->title.'</br>';
-        	echo $entrada->link;
-            echo get_image_sites($entrada->link);
-        	echo $entrada->description;
-        	echo '</br></br>';*/
-        }     
-        
-        return $total;   
-    }
-    
     public function job_pegar_posts()
     {
-        $origens_imgur = $this->config->item('origens_imgur');
-        foreach($origens_imgur as $origem) 
+        $jobs = $this->M_Jobs_pegar_posts->find_all_ativo();
+        foreach($jobs as $job)
         {
-            if($origem['ativo'])
+            if($job['chance_de_ser_executado'] >= sorteio())
             {
-                print_r($this->pegar_imgur($origem['nome_reddit'], 'day', $origem));
-            }
-        }
-        
-        $parametros = $this->config->item('parametros');
-        $origens_deviantart = $this->config->item('origens_deviantart');
-        
-        foreach($origens_deviantart as $key=>$value)
-        {
-            if($value['ativo'] == FALSE)
-            {
-                unset($origens_deviantart[$key]);
-            }                        
-        }
-                        
-        $origens_sorteadas = array_rand($origens_deviantart, $parametros['qtd_pegar_deviantart']);
-        if($parametros['qtd_pegar_deviantart'] == 1)
-        {
-            print_r($this->pegar_deviantart($origens_deviantart[$origens_sorteadas]));
-        }
-        else if($parametros['qtd_pegar_deviantart'] >= 1)
-        {
-            foreach($origens_sorteadas as $origem_sorteada)
-            {
-                print_r($this->pegar_deviantart($origens_deviantart[$origens_sorteadas]));
+                $origem = $this->M_Origens->find_id($job['origem_id']);
+                print_r($this->pegar_imgur($origem['nome_reddit'], $job['periodo'], $job['origem_id']));
             }
         }
     }
@@ -227,7 +140,7 @@ class C_Job extends CI_Controller {
     
     public function testes2()
     {
-        echo texto_to_link('teste http://imgur.com outro link http://google.com', 'http://adfly.com/45125/');
+        print_r($this->M_Jobs_pegar_posts->find_all_ativo());
     }
     
     public function testes()

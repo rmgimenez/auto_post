@@ -1,7 +1,7 @@
 ----
 -- phpLiteAdmin database dump (https://bitbucket.org/phpliteadmin/public)
 -- phpLiteAdmin version: 1.9.6
--- Exported: 9:23pm on June 30, 2016 (CEST)
+-- Exported: 10:22pm on June 30, 2016 (CEST)
 -- database file: ./application/banco/\banco.sqlite
 ----
 BEGIN TRANSACTION;
@@ -110,12 +110,12 @@ DROP TABLE "jobs_envio";
 ----
 -- Table structure for jobs_envio
 ----
-CREATE TABLE "jobs_envio" ('id' INTEGER PRIMARY KEY NOT NULL, 'ativo' INTEGER DEFAULT 0 , 'grupo' TEXT, 'ordem' TEXT, 'ordem_forma' TEXT, 'quantidade' INTEGER, 'sender_id' INTEGER, 'destino_id' INTEGER, 'chance_de_ser_executado' INTEGER DEFAULT 0);
+CREATE TABLE "jobs_envio" ('id' INTEGER PRIMARY KEY NOT NULL, 'ativo' INTEGER DEFAULT 0 , 'grupo' TEXT, 'ordem' TEXT, 'ordem_forma' TEXT, 'quantidade' INTEGER, 'sender_id' INTEGER, 'destino_id' INTEGER, 'chance_de_ser_executado' INTEGER DEFAULT 0, 'usar_encurtador_link' INTEGER DEFAULT 0);
 
 ----
 -- Data dump for jobs_envio, a total of 1 rows
 ----
-INSERT INTO "jobs_envio" ("id","ativo","grupo","ordem","ordem_forma","quantidade","sender_id","destino_id","chance_de_ser_executado") VALUES ('1','1','cosplay','id','desc','2','1','1','80');
+INSERT INTO "jobs_envio" ("id","ativo","grupo","ordem","ordem_forma","quantidade","sender_id","destino_id","chance_de_ser_executado","usar_encurtador_link") VALUES ('1','1','cosplay','id','desc','2','1','1','80','0');
 
 ----
 -- Drop table for postagens
@@ -135,22 +135,6 @@ CREATE TABLE 'postagens' (
 ----
 
 ----
--- Drop table for jobs_pegar_posts
-----
-DROP TABLE "jobs_pegar_posts";
-
-----
--- Table structure for jobs_pegar_posts
-----
-CREATE TABLE 'jobs_pegar_posts' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'subreddit' TEXT, 'periodo' TEXT, 'ativo' INTEGER DEFAULT 0 , 'chance_de_ser_executado' INTEGER DEFAULT 0 );
-
-----
--- Data dump for jobs_pegar_posts, a total of 2 rows
-----
-INSERT INTO "jobs_pegar_posts" ("id","subreddit","periodo","ativo","chance_de_ser_executado") VALUES ('1','cosplay','day','1','50');
-INSERT INTO "jobs_pegar_posts" ("id","subreddit","periodo","ativo","chance_de_ser_executado") VALUES ('2','cosplay','week','1','30');
-
-----
 -- Drop table for parametros
 ----
 DROP TABLE "parametros";
@@ -158,10 +142,26 @@ DROP TABLE "parametros";
 ----
 -- Table structure for parametros
 ----
-CREATE TABLE 'parametros' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'usar_encurtador_link' INTEGER, 'encurtador_link' TEXT, 'ajuda' TEXT);
+CREATE TABLE 'parametros' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'encurtador_link' TEXT, 'ajuda' TEXT);
 
 ----
 -- Data dump for parametros, a total of 1 rows
 ----
-INSERT INTO "parametros" ("id","usar_encurtador_link","encurtador_link","ajuda") VALUES ('1','1','http://q.gs/1905608/',NULL);
+INSERT INTO "parametros" ("id","encurtador_link","ajuda") VALUES ('1','http://q.gs/1905608/',NULL);
+
+----
+-- Drop table for jobs_pegar_posts
+----
+DROP TABLE "jobs_pegar_posts";
+
+----
+-- Table structure for jobs_pegar_posts
+----
+CREATE TABLE 'jobs_pegar_posts' ('id' INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 'periodo' TEXT, 'ativo' INTEGER DEFAULT 0 , 'chance_de_ser_executado' INTEGER DEFAULT 0 , 'origem_id' INTEGER, 'descricao' TEXT);
+
+----
+-- Data dump for jobs_pegar_posts, a total of 2 rows
+----
+INSERT INTO "jobs_pegar_posts" ("id","periodo","ativo","chance_de_ser_executado","origem_id","descricao") VALUES ('1','day','1','50','1','Cosplay - Day');
+INSERT INTO "jobs_pegar_posts" ("id","periodo","ativo","chance_de_ser_executado","origem_id","descricao") VALUES ('2','week','1','20','1','Cosplay - Week');
 COMMIT;

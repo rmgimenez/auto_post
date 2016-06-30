@@ -39,7 +39,7 @@ class M_Posts extends MY_Model {
                 return NULL;
         }
 
-        $this->db->where('$hash', $hash);
+        $this->db->where('hash', $hash);
         $query = $this->db->get($this->table);
 
         $result = $query->result_array();

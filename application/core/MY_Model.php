@@ -38,7 +38,7 @@ class MY_Model extends CI_Model {
                 $query = $this->db->get($this->table);
                 return $query->result_array();
         }
- 
+        
         function update($id, $data)
         {
                 $this->db->where('id', $id);
@@ -52,6 +52,13 @@ class MY_Model extends CI_Model {
                         $this->db->where('id', $id);                    
                         $this->db->delete($this->table);                        
                 }
+        }
+        
+        public function find_all_ativo()
+        {
+            $this->db->where('ativo', 1);
+            $query = $this->db->get($this->table);
+            return $query->result_array();
         }       
 }
  
