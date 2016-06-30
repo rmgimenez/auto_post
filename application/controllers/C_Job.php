@@ -17,25 +17,8 @@ class C_Job extends CI_Controller {
     
     public function rodar_job()
     {
-        $parametros = $this->config->item('parametros');
-        $chance_de_pegar_posts = $parametros['chance_de_pegar_posts'];
-        if($chance_de_pegar_posts == -1)
-        {
-            $this->job_pegar_posts();
-            $this->job_enviar_posts();            
-        }
-        else
-        {
-            $chance = rand(1,100);
-            if($chance <= $chance_de_pegar_posts)
-            {
-                $this->job_pegar_posts();
-            }
-            else
-            {
-                $this->job_enviar_posts();
-            }
-        }
+        $this->job_pegar_posts();
+        $this->job_enviar_posts();            
     }
     
     /**
@@ -128,6 +111,7 @@ class C_Job extends CI_Controller {
             if($job['chance_de_ser_executado'] >= sorteio())
             {
                 $origem = $this->M_Origens->find_id($job['origem_id']);
+                print('<p>Job Executado = '.$job['descricao'].'</p>');
                 print_r($this->pegar_imgur($origem['nome_reddit'], $job['periodo'], $job['origem_id']));
             }
         }
