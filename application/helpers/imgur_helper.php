@@ -47,17 +47,24 @@ class Imgur
                 $posts[$i]['is_album'] = $this->boleano_xml($item->is_album);  
                 $posts[$i]['ext'] = (string)$item->ext;
                 $posts[$i]['author'] = (string)$item->author;
+                $posts[$i]['create_datetime'] = date($item->create_datetime);
+                
                 if($posts[$i]['is_album'] == 1)
                 {
                     $posts[$i]['imagens'] = $this->get_imagens_album($item->hash);
                     $posts[$i]['source'] = 'http://imgur.com/a/'.$item->hash;
+                    //print_r($this->get_dados_album($item->hash));   
                 }
                 else
                 {
                     $posts[$i]['imagens'][] = 'http://imgur.com/'.$item->hash.$item->ext;
                     $posts[$i]['source'] = 'http://imgur.com/'.$item->hash;
+                    //print_r($this->get_dados_imagem($item->hash));   
                 }
-                $i += 1;                                
+                $posts[$i]['total_imagens'] = count($posts[$i]['imagens']);
+                $i += 1;  
+                
+                                           
             }
             
             return $posts;                        
@@ -68,6 +75,43 @@ class Imgur
             return NULL;
         }             
     }
+    
+    /**
+     * Retorna um array com os dados do album
+     * Essa consulta utiliza a API do site imgur.com
+     */
+    private function get_dados_album($hash)
+    {
+        $client_id = "8150e8df809b5dd";
+        $c_url = curl_init();
+        curl_setopt($c_url, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($c_url, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($c_url, CURLOPT_URL,"https://api.imgur.com/3/album/".$hash);
+        curl_setopt($c_url, CURLOPT_HTTPHEADER, array('Authorization: Client-ID ' . $client_id));
+        $result=curl_exec($c_url);
+        curl_close($c_url);
+        $json_array = json_decode($result, true);
+        return $json_array;
+    }
+    
+    /**
+     * Retorna um array com os dados da imagem
+     * Essa consulta utiliza a API do site imgur.com
+     */
+    private function get_dados_imagem($hash)
+    {
+        $client_id = "8150e8df809b5dd";
+        $c_url = curl_init();
+        curl_setopt($c_url, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($c_url, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($c_url, CURLOPT_URL,"https://api.imgur.com/3/image/".$hash);
+        curl_setopt($c_url, CURLOPT_HTTPHEADER, array('Authorization: Client-ID ' . $client_id));
+        $result=curl_exec($c_url);
+        curl_close($c_url);
+        $json_array = json_decode($result, true);
+        return $json_array;
+    }    
+    
     
     /**
      * Esse método retorna um array com todas as imagens do album
@@ -89,7 +133,10 @@ class Imgur
             if(substr($tag->getAttribute('src'), 0, 13) == '//i.imgur.com')
             {
                 $link_imagem = 'http:'.$tag->getAttribute('src');
-                $imagens[] = $link_imagem;
+                if(!(in_array($link_imagem, $imagens)))
+                {
+                    $imagens[] = $link_imagem;
+                }
             }   
         }
         
