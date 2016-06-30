@@ -20,9 +20,6 @@ class Welcome extends CI_Controller {
      */
     public function index()
     {
-        $this->config->load('rmg_config');
-        print_r($this->config->item('origens_deviantart'));
-
         $this->load->view('welcome_message');
     }
 }
