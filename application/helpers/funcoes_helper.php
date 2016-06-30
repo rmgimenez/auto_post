@@ -177,3 +177,11 @@ function formata_link_reddit($parte_reddit)
 {
     return 'http://reddit.com'.$parte_reddit;
 }
+
+/**
+ * Retorna um número aleatório entre 1 e 100
+ */
+function sorteio()
+{
+    return rand(1, 100);
+}

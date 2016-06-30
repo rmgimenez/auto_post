@@ -48,7 +48,11 @@ class C_Job extends CI_Controller {
         $total['total'] = 0;
         $total['atualizados'] = 0;
         $total['inseridos'] = 0;
-        $itens = get_imgur_reddit($subreddit, $periodo);
+        
+        $this->load->helper('imgur');
+        $imgur = new Imgur();
+        $itens = $imgur->get_array_imgur($subreddit, $periodo);
+        
         // se não entrar no if significa que deu algum erro
         if($itens)
         {
@@ -56,7 +60,7 @@ class C_Job extends CI_Controller {
             {
                 $total['total'] += 1;
                 
-                $post_existe = $this->M_Posts->find_by_id_imgur($item->id);
+                $post_existe = $this->M_Posts->find_by_hash($item['hash']);
                 
                 if($post_existe != NULL)
                 {
@@ -64,8 +68,8 @@ class C_Job extends CI_Controller {
                     $total['atualizados'] += 1;
                     
                     $post = array(
-                        'views' => $item->views,
-                        'score' => $item->score
+                        'views' => $item['views'],
+                        'score' => $item['score']
                     );
                     $this->db->where('id', $post_existe['id']);
                     $this->db->update('posts', $post);
@@ -76,62 +80,35 @@ class C_Job extends CI_Controller {
                     $total['inseridos'] += 1;
                     
                     $post = array();
-                    $post['id_imgur'] = $item->id;
-                    $post['hash'] = $item->hash;
-                    $post['title'] = $item->title;
-                    $post['title_limpo'] = limpa_titulo($item->title);
-                    $post['author'] = $item->author;
-                    $post['score'] = $item->score;
-                    $post['description'] = $item->description;                    
-                    $post['nsfw'] = boleano_xml($item->nsfw);
-                    $post['reddit'] = $item->reddit;
-                    $post['ext'] = $item->ext;
-                    $post['subreddit'] = $item->subreddit;
-                    $post['site_origem'] = 'imgur';
-                    $post['is_album'] = boleano_xml($item->is_album);     
+                    $post['id_imgur'] = $item['id'];
+                    $post['hash'] = $item['hash'];
+                    $post['title'] = $item['title'];
+                    $post['title_limpo'] = $item['title_limpo'];
+                    $post['description'] = $item['description'];
+                    $post['views'] = $item['views'];
+                    $post['score'] = $item['score'];
+                    $post['reddit'] = $item['reddit'];
+                    $post['reddit_link'] = $item['reddit_link'];
+                    $post['subreddit'] = $item['subreddit'];
+                    $post['nsfw'] = $item['nsfw'];
+                    $post['is_album'] = $item['is_album'];
+                    $post['author'] = $item['author'];
+                    $post['create_datetime'] = $item['create_datetime'];
+                    $post['source'] = $item['source'];
+                    $post['total_geral_imagens'] = $item['total_geral_imagens'];
+                    $post['total_gif'] = $item['total_gif'];
+                    $post['total_imagens'] = $item['total_imagens'];     
                     $post['grupo'] = $origem['grupo'];
                     $post['tags'] = $origem['tags'];         
-                    if(boleano_xml($item->is_album) == 1)
-                    {
-                        $post['link'] = link_item_imgur($item->hash);
-                    }
-                    else
-                    {
-                        $post['link'] = 'http://imgur.com/'.$item->hash;                        
-                    }
 
                     $id = $this->M_Posts->insert($post);
-                    if(boleano_xml($item->is_album) == 1)
+                    
+                    foreach($item['imagens'] as $imagem)
                     {
-                        // se for um album
-                        $stream = stream_context_create(array
-                        (
-                                'http' => array('user_agent' => 'Nokia6600/1.0 (5.27.0) SymbianOS/7.0s Series60/2.0 Profile/MIDP-2.0 Configuration/CLDC-1')
-                        ));
-                        $src = file_get_contents('http://imgur.com/a/'.$item->hash.'/layout/blog', FALSE, $stream);
-                        $doc = new DOMDocument();
-                        @$doc->loadHTML($src);
-                        $tags = $doc->getElementsByTagName('img');
-                        foreach ($tags as $tag) 
-                        {
-                            //echo $tag->getAttribute('src').'</br>';
-                            if(substr($tag->getAttribute('src'), 0, 13) == '//i.imgur.com')
-                            {
-                                $link_imagem = 'http:'.$tag->getAttribute('src');
-                                $imagem = array();
-                                $imagem['posts_id'] = $id;
-                                $imagem['link'] = $link_imagem;
-                                $this->M_Imagens->insert($imagem);
-                            }   
-                        }                        
-                    }
-                    else
-                    {
-                        // se não for um album                        
-                        $imagem = array();
-                        $imagem['posts_id'] = $id;
-                        $imagem['link'] = link_item_imgur($item->hash, $item->ext);
-                        $this->M_Imagens->insert($imagem);
+                        $dados_imagem = array();
+                        $dados_imagem['posts_id'] = $id;
+                        $dados_imagem['link'] = $imagem;
+                        $this->M_Imagens->insert($dados_imagem);
                     }
                 }
             }                       
@@ -248,10 +225,26 @@ class C_Job extends CI_Controller {
         echo 'Job enviar_posts';        
     }
     
-    public function testes()
+    public function testes2()
     {
         $this->load->helper('imgur');
         $imgur = new Imgur();
-        print_r($imgur->get_array_imgur('cosplay', 'day'));
+        print_r($imgur->get_array_imgur('funny', 'day'));
+    }
+    
+    public function testes()
+    {
+        $origens_imgur = $this->config->item('origens_imgur');
+        foreach($origens_imgur as $origem) 
+        {
+            if($origem['ativo'])
+            {
+                print_r($this->pegar_imgur($origem['nome_reddit'], 'day', $origem));
+                print_r($this->pegar_imgur($origem['nome_reddit'], 'week', $origem));
+                print_r($this->pegar_imgur($origem['nome_reddit'], 'month', $origem));
+                print_r($this->pegar_imgur($origem['nome_reddit'], 'year', $origem));
+                print_r($this->pegar_imgur($origem['nome_reddit'], 'all', $origem));
+            }
+        }
     }
 }

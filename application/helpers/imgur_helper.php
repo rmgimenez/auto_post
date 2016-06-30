@@ -61,10 +61,24 @@ class Imgur
                     $posts[$i]['source'] = 'http://imgur.com/'.$item->hash;
                     //print_r($this->get_dados_imagem($item->hash));   
                 }
-                $posts[$i]['total_imagens'] = count($posts[$i]['imagens']);
-                $i += 1;  
+                $posts[$i]['total_geral_imagens'] = count($posts[$i]['imagens']);
                 
-                                           
+                $posts[$i]['total_gif'] = 0;
+                $posts[$i]['total_imagens'] = 0;
+                foreach($posts[$i]['imagens'] as $imagens)
+                {
+                    $partes = explode('.', $imagens);
+                    if($partes[count($partes) - 1] == 'gif')
+                    {
+                        $posts[$i]['total_gif'] += 1;
+                    }
+                    else
+                    {
+                        $posts[$i]['total_imagens'] += 1;
+                    }
+                }
+                
+                $i += 1;                  
             }
             
             return $posts;                        

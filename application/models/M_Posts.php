@@ -32,6 +32,20 @@ class M_Posts extends MY_Model {
         return (count($result) > 0 ? $result[0] : NULL);
     }
     
+    public function find_by_hash($hash)
+    {
+        if ($hash == NULL)
+        {
+                return NULL;
+        }
+
+        $this->db->where('$hash', $hash);
+        $query = $this->db->get($this->table);
+
+        $result = $query->result_array();
+        return (count($result) > 0 ? $result[0] : NULL);
+    }
+    
     public function find_by_link($link)
     {
         if ($link == NULL)
