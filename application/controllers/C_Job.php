@@ -6,7 +6,7 @@ class C_Job extends CI_Controller {
     function __construct()
     {
         parent::__construct();
-        $this->config->load('rmg_config');
+        $this->config->load('rmg_config');        
         $this->output->enable_profiler(TRUE);
     }
 
@@ -227,9 +227,7 @@ class C_Job extends CI_Controller {
     
     public function testes2()
     {
-        $this->load->helper('imgur');
-        $imgur = new Imgur();
-        print_r($imgur->get_array_imgur('funny', 'day'));
+        echo texto_to_link('teste http://imgur.com outro link http://google.com', 'http://adfly.com/45125/');
     }
     
     public function testes()

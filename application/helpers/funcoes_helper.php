@@ -179,6 +179,17 @@ function formata_link_reddit($parte_reddit)
 }
 
 /**
+ * Função que cria tag html de links nos textos que forem links
+ */
+function texto_to_link($texto, $link_encurtador = '', $rel_nofollow = true, $target_blank = true)
+{
+    return preg_replace(
+              "~[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]~",
+              "<a href=\"{$link_encurtador}\\0\" target='_blank' rel='nofollow'>\\0</a>", 
+              $texto);
+}
+
+/**
  * Retorna um número aleatório entre 1 e 100
  */
 function sorteio()

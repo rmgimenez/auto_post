@@ -89,7 +89,7 @@ $autoload['drivers'] = array();
 |
 |	$autoload['helper'] = array('url', 'file');
 */
-$autoload['helper'] = array('url', 'funcoes');
+$autoload['helper'] = array('url', 'funcoes', 'imgur');
 
 /*
 | -------------------------------------------------------------------
@@ -132,4 +132,4 @@ $autoload['language'] = array();
 |
 |	$autoload['model'] = array('first_model' => 'first');
 */
-$autoload['model'] = array('M_Posts', 'M_Imagens');
+$autoload['model'] = array('M_Posts', 'M_Imagens', 'M_Destinos', 'M_Jobs_envio', 'M_Jobs_pegar_posts', 'M_Origens', 'M_Parametros', 'M_Postagens', 'M_Senders');
