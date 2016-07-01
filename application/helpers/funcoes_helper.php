@@ -179,14 +179,30 @@ function formata_link_reddit($parte_reddit)
 }
 
 /**
+ * Nome do arquivo de um link imgur
+ */
+function get_nome_arquivo_imgur($link)
+{
+    $partes = explode('/', $link);
+    return $partes[count($partes) - 1];
+}
+
+/**
  * Função que cria tag html de links nos textos que forem links
  */
 function texto_to_link($texto, $link_encurtador = '', $rel_nofollow = true, $target_blank = true)
 {
+    $texto = str_replace(' www.', ' http://www.', $texto);
     return preg_replace(
               "~[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]~",
               "<a href=\"{$link_encurtador}\\0\" target='_blank' rel='nofollow'>\\0</a>", 
               $texto);
+    /*
+    preg_replace(
+              "~[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]~",
+              "<a href=\"\\0\">\\0</a>", 
+              $string);
+    */           
 }
 
 /**

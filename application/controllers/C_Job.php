@@ -127,30 +127,19 @@ class C_Job extends CI_Controller {
         $destino = $this->M_Destinos->find_id($job['destino_id']);
         $parametros = $this->M_Parametros->find_id(1);
         
-        $mail->SMTPSecure = 'tls';
-        $mail->Username = "rmgimenez1@hotmail.com";
-        $mail->Password = "moura85@";
+        $mail->SMTPSecure = $sender['smtp_secure'];
+        $mail->Username = $sender['username'];
+        $mail->Password = $sender['password'];
         //$mail->AddAddress("rmgimenez1@hotmail.com"); // pessoa que receberá o email
-        $mail->From = "rmgimenez1@hotmail.com";
-        $mail->Host = "smtp.live.com";
-        $mail->Port = 587;
+        $mail->From = $sender['email'];
+        $mail->Host = $sender['host'];
+        $mail->Port = $sender['port'];
         $mail->IsSMTP();
         $mail->SMTPAuth = true;
         
-        $config = Array(
-            'protocol' => 'smtp',
-            'smtp_host' => $sender['smtp_secure'].'://'.$sender['host'],
-            'smtp_port' => $sender['port'],
-            'smtp_user' => $sender['username'],
-            'smtp_pass' => $sender['password'],
-            'mailtype'  => 'html',
-            'charset' => 'utf-8',
-            'wordwrap' => TRUE
-        );
-        $this->load->library('email', $config);
-        
-        $this->email->from($sender['email'], $sender['from']);
-        $this->email->to($destino['email']);
+        $mail->FromName = "Ricardo";
+        $mail->AddAddress($destino['email']);
+        $mail->Subject = $post['title_limpo'];
         
         $encurtador_link = '';
         if($job['usar_encurtador_link'] == 1)
@@ -158,22 +147,37 @@ class C_Job extends CI_Controller {
             $encurtador_link = $parametros['encurtador_link'];
         } 
         
-        $this->email->subject($post['title_limpo']);
-        $mensagem = '<h2>'.$post['title_limpo'].'</h2>';
+        $mensagem = '<p>'.$post['title_limpo'].'</p>';
         $mensagem .= nl2br(texto_to_link($post['description'], $encurtador_link));
-        $this->email->message($mensagem);
+        $mensagem .= '<p><b>Source: </b>'.texto_to_link(formata_link_reddit($post['reddit']), $encurtador_link).'</p>';
+        $mensagem .= $post['tags'].' '.$job['tags'].' '.$destino['tags'];
+        $mail->Body = $mensagem;
         foreach($imagens as $imagem)
         {
-            $this->email->attach($imagem['link']);
+            $mail->addStringAttachment(file_get_contents($imagem['link']), get_nome_arquivo_imgur($imagem['link']));
+        }        
+        
+        //$mail->IsHTML(true);
+        if($mail->Send())
+        {
+            $enviado = array(
+                'id' => $post['id'],
+                'titulo' => $post['title_limpo'],
+            );
         }
-        $this->email->set_mailtype('html');
+        else
+        {
+            $enviado = array(
+                'Erro' => 'falha ao enviar',
+            );
+        }
         
-        $this->email->send();
-        
-        $enviado = array(
-            'id' => $post['id'],
-            'titulo' => $post['title_limpo'],
+        $record_postado = array(
+            'post_id' => $post['id'],
+            'data_post' => date('Y-m-d H:i:s'),
+            'destino_id' => $destino['id'],        
         );
+        $this->M_Postagens->insert($record_postado);
         
         return $enviado;
     } 
@@ -183,20 +187,17 @@ class C_Job extends CI_Controller {
         $jobs = $this->M_Jobs_envio->find_all_ativo();
         foreach($jobs as $job)
         {
-            $i = 0;
-            while($i < $job['quantidade'])
-            {
-                $post = $this->M_Posts->busca_para_job($job['grupo'], $job['ordem'], $job['ordem_forma'], 1, $job['destino_id']);
-                $post = $post[0];
-                print_r($this->enviar_email($post, $job));
-                
-                $i += 1;
-            }
             if($job['chance_de_ser_executado'] >= sorteio())
             {
-                $origem = $this->M_Origens->find_id($job['origem_id']);
-                print('<p>Job Executado = '.$job['descricao'].'</p>');
-                print_r($this->pegar_imgur($origem['nome_reddit'], $job['periodo'], $job['origem_id']));
+                $i = 0;
+                while($i < $job['quantidade'])
+                {
+                    $post = $this->M_Posts->busca_para_job($job['grupo'], $job['ordem'], $job['ordem_forma'], 1, $job['destino_id']);
+                    $post = $post[0];
+                    print_r($this->enviar_email($post, $job));
+                    
+                    $i += 1;
+                }
             }
         }       
     }
@@ -208,17 +209,6 @@ class C_Job extends CI_Controller {
     
     public function testes()
     {
-        $origens_imgur = $this->config->item('origens_imgur');
-        foreach($origens_imgur as $origem) 
-        {
-            if($origem['ativo'])
-            {
-                print_r($this->pegar_imgur($origem['nome_reddit'], 'day', $origem));
-                print_r($this->pegar_imgur($origem['nome_reddit'], 'week', $origem));
-                print_r($this->pegar_imgur($origem['nome_reddit'], 'month', $origem));
-                print_r($this->pegar_imgur($origem['nome_reddit'], 'year', $origem));
-                print_r($this->pegar_imgur($origem['nome_reddit'], 'all', $origem));
-            }
-        }
+        echo texto_to_link('www.yahoo.com http://www.yahoo.com www.yahoo.com', 'http://adfly.com/44455/');
     }
 }
