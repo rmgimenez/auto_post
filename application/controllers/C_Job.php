@@ -119,6 +119,9 @@ class C_Job extends CI_Controller {
     
     private function enviar_email($post, $job)
     {
+        $this->load->library('My_PHPMailer');
+        $mail = new PHPMailer();
+        
         $sender = $this->M_Senders->find_id($job['sender_id']);
         $imagens = $this->M_Imagens->find_all_por_post($post['id'], TRUE);
         $destino = $this->M_Destinos->find_id($job['destino_id']);
