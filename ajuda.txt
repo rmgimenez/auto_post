@@ -5,3 +5,5 @@ http://br.phptherightway.com/#site-header
 Enviar email com o codeigniter
 http://stackoverflow.com/questions/33165341/sending-long-description-along-with-attachment-using-smtp-in-codeigniter
 https://www.codeigniter.com/userguide3/libraries/email.html
+
+https://www.codeigniter.com/userguide3/database/query_builder.html

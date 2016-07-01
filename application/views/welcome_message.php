@@ -72,6 +72,17 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 	<div id="body">
         <p><a href="http://localhost:81/auto_post/index.php/C_job/rodar_job">Executar jobs</a></p>
+        <p><a href="http://localhost:81/auto_post/index.php/C_job/job_pegar_posts">Job pegar posts</a></p>
+        <p>-</p>
+	</div>
+    
+    <div id="body">
+        <p><a href="http://localhost:81/auto_post/index.php/C_job/testes">Teste 1</a></p>
+        <p><a href="http://localhost:81/auto_post/index.php/C_job/testes2">Teste 2</a></p>
+        
+        
+        <p><a href="http://localhost:81/auto_post/phpliteadmin.php">PHPSqliteAdmin</a></p>
+        
 	</div>
 
 	<p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds. <?php echo  (ENVIRONMENT === 'development') ?  'CodeIgniter Version <strong>' . CI_VERSION . '</strong>' : '' ?></p>
