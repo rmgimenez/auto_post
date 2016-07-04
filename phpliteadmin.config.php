@@ -14,6 +14,7 @@ $password = 'moura';
 
 //directory relative to this file to search for databases (if false, manually list databases in the $databases variable)
 $directory = './application/banco/';
+$directory = false;
 
 //whether or not to scan the subdirectories of the above directory infinitely deep
 $subdirectories = false;
@@ -22,7 +23,7 @@ $subdirectories = false;
 //if any of the databases do not exist as they are referenced by their path, they will be created automatically
 $databases = array(
 	array(
-		'path'=> 'application/banco/banco.sqlite',
+		'path'=> './application/banco/banco.sqlite',
 		'name'=> 'banco.sqlite'
 	),
 	array(

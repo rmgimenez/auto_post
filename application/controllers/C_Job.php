@@ -149,7 +149,9 @@ class C_Job extends CI_Controller {
         
         $mensagem = '<p>'.$post['title_limpo'].'</p>';
         $mensagem .= nl2br(texto_to_link($post['description'], $encurtador_link));
-        $mensagem .= '<p><b>Source: </b>'.texto_to_link(formata_link_reddit($post['reddit']), $encurtador_link).'</p>';
+        $source_reddit = formata_link_reddit($post['reddit']);
+        $source_reddit = anchor($source_reddit, $post['reddit'], array('target' => '_blank', 'rel' => 'nofollow'));
+        $mensagem .= '<p><b>Source: </b>'.$source_reddit.'</p>';
         $mensagem .= $post['tags'].' '.$job['tags'].' '.$destino['tags'];
         $mail->Body = $mensagem;
         foreach($imagens as $imagem)
@@ -172,6 +174,7 @@ class C_Job extends CI_Controller {
             );
         }
         
+        // grava na tabela postgens que o item foi postado.
         $record_postado = array(
             'post_id' => $post['id'],
             'data_post' => date('Y-m-d H:i:s'),
@@ -204,7 +207,7 @@ class C_Job extends CI_Controller {
     
     public function testes2()
     {
-        $this->job_enviar_posts();
+        $this->load->view('template');
     }
     
     public function testes()
